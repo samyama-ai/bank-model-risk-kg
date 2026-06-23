@@ -1,0 +1,30 @@
+[project]
+name = "bank-model-risk-kg"
+version = "0.1.0"
+description = "Bank Model-Risk Knowledge Graph — synthetic model governance, lineage & explainability in the Samyama graph database"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Madhulatha Mandarapu", email = "madhulatha@samyama.ai"},
+    {name = "Sandeep Kunkunuru", email = "sandeep@samyama.ai"},
+]
+keywords = ["knowledge-graph", "model-risk", "ai-governance", "banking", "sr-11-7",
+            "explainable-ai", "graph-database", "samyama"]
+
+dependencies = [
+    "requests>=2.28",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.1.0"]
+
+[tool.setuptools.packages.find]
+include = ["etl*"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
