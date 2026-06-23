@@ -62,7 +62,7 @@ Full details: **[docs/schema.md](docs/schema.md)**.
 # Start Samyama (build it once: cargo build --release in samyama-graph)
 ./target/release/samyama --host 127.0.0.1 --port 6379
 
-# Import the committed snapshot (28 KB)
+# Import the committed snapshot (85 KB; includes the regulation HNSW vector index)
 curl -X POST http://127.0.0.1:8080/api/snapshot/import \
   -F "file=@data/bank-model-risk.sgsnap"
 ```
@@ -94,6 +94,32 @@ RETURN m.name, collect(DISTINCT f.name) AS features, collect(DISTINCT ds.name) A
 
 All 8 ship in **[queries/governance-queries.cypher](queries/governance-queries.cypher)** and are
 gated in CI-style validation (each must return rows).
+
+## GraphRAG over regulation (explainable, source-traced Q&A)
+
+Each `RegulatoryRequirement` carries its obligation text, embedded with
+`all-MiniLM-L6-v2` (384-dim, via [fastembed](https://github.com/qdrant/fastembed) — no torch)
+into a Samyama HNSW vector index. A natural-language governance question is embedded,
+the most relevant clauses are retrieved by cosine similarity, and each is then
+**grounded in the graph** — which models it governs, which controls satisfy it, which
+models carry open findings under it. The answer is deterministic and citable: the
+clause comes from vector retrieval, the counts from graph traversals an auditor can re-run.
+
+```bash
+# with a Samyama server running and the KG loaded (see below)
+python -m etl.graphrag "How must we independently validate models and challenge them?"
+```
+```
+SR 11-7 III — Independent model validation with effective challenge   (similarity 0.77)
+   governs 53 models   satisfied by controls: Annual independent validation (Needs improvement), …
+   models with open/overdue findings under it: LLM Adverse-Media Screening · CRE #42 (5 open); …
+```
+
+The loader builds this automatically: it creates the vector index, then embeds and
+indexes every requirement (`python -m etl.loader … ` — pass `--no-embed` to skip).
+The exported snapshot carries the HNSW index, so an importing server can vector-search
+immediately. After a snapshot import, node properties are read back via Cypher by id
+(columnar storage returns empty inline props on the search response) — handled in `etl/graphrag.py`.
 
 ## Tests
 

@@ -72,3 +72,27 @@ class SamyamaClient:
         r.raise_for_status()
         with open(path, "wb") as f:
             f.write(r.content)
+
+    def create_vector_index(self, label: str, property_key: str,
+                            dimensions: int, metric: str = "cosine") -> dict:
+        """Create an HNSW vector index. Must be done BEFORE setting embeddings —
+        on this build, an index created after insert does not backfill."""
+        r = requests.post(
+            f"{self.base_url}/api/vector/indexes",
+            json={"label": label, "property_key": property_key,
+                  "dimensions": dimensions, "metric": metric},
+            timeout=60,
+        )
+        r.raise_for_status()
+        return r.json()
+
+    def vector_search(self, label: str, property_key: str,
+                      query_vector: list[float], k: int = 10) -> list[dict]:
+        r = requests.post(
+            f"{self.base_url}/api/vector-search",
+            json={"label": label, "property_key": property_key,
+                  "query_vector": query_vector, "k": k, "graph": self.graph},
+            timeout=120,
+        )
+        r.raise_for_status()
+        return r.json().get("results", [])

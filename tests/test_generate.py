@@ -55,6 +55,22 @@ def test_anchor_entities_exist():
     assert "AML Transaction Monitoring" in cats
 
 
+def test_regulations_have_embeddable_text():
+    """Every RegulatoryRequirement carries obligation text (the GraphRAG corpus)."""
+    nodes, *_ = _build()
+    regs = [p for l, p in nodes if l == "RegulatoryRequirement"]
+    assert regs
+    for r in regs:
+        assert r.get("text") and len(r["text"]) > 60
+
+
+def test_embed_module_dim_constant():
+    """embed module advertises 384-dim without downloading the model."""
+    from etl.embed import DIM, MODEL_NAME
+    assert DIM == 384
+    assert "MiniLM" in MODEL_NAME
+
+
 def test_blast_radius_connectivity():
     """Some model depends on Core Banking Ledger AND feeds a submission (Q1)."""
     nodes, edges, by_id, out = _build()

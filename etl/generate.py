@@ -101,23 +101,40 @@ ASSUMPTIONS = [
     ("Severely-adverse unemployment peak of 10%", "Macro"),
 ]
 
+# (framework, clause, title, obligation_text) — the text is the corpus GraphRAG embeds.
 REG_REQS = [
-    ("SR 11-7", "II", "Model development, implementation and use evidenced"),
-    ("SR 11-7", "III", "Independent model validation with effective challenge"),
-    ("SR 11-7", "IV", "Model inventory and governance with clear ownership"),
-    ("Basel III", "CRE36", "IRB models: rating system design and quantification"),
-    ("Basel III", "MAR", "Market risk internal models approval"),
-    ("IFRS 9", "5.5", "Expected credit loss measurement and staging"),
-    ("IFRS 9", "B5.5", "Forward-looking information and scenarios"),
-    ("ECB TRIM", "GIM", "General topics: model governance and data quality"),
-    ("ECB TRIM", "Credit", "Credit risk: PD/LGD estimation soundness"),
-    ("EU AI Act", "Art.9", "High-risk AI: risk management system"),
-    ("EU AI Act", "Art.13", "High-risk AI: transparency and explainability"),
-    ("EU AI Act", "Art.14", "High-risk AI: human oversight"),
-    ("RBI", "MRM", "Model risk management framework for banks"),
-    ("CCAR/DFAST", "Stress", "Capital stress-test model governance"),
-    ("BCBS 239", "P3", "Risk data aggregation: accuracy and integrity"),
-    ("FRTB", "IMA", "Internal models approach eligibility"),
+    ("SR 11-7", "II", "Model development, implementation and use evidenced",
+     "Model development, implementation, and use must be supported by sound design, theory, and documented logic. The bank must evidence that data, assumptions, and methodology are appropriate for the model's intended purpose, with developmental testing and ongoing monitoring."),
+    ("SR 11-7", "III", "Independent model validation with effective challenge",
+     "Models must undergo independent validation that provides effective challenge: a critical review by parties not responsible for development, covering conceptual soundness, outcomes analysis (backtesting and benchmarking), and ongoing monitoring. Validation findings must be tracked to remediation."),
+    ("SR 11-7", "IV", "Model inventory and governance with clear ownership",
+     "Banks must maintain a comprehensive model inventory and a governance framework with clear roles, ownership, policies, and board and senior-management oversight of model risk across the model lifecycle."),
+    ("Basel III", "CRE36", "IRB models: rating system design and quantification",
+     "Internal ratings-based credit risk models must have a sound rating system design and robust quantification of PD, LGD, and EAD parameters, with rating assignment, calibration, and use-test requirements."),
+    ("Basel III", "MAR", "Market risk internal models approval",
+     "Use of internal models for market risk regulatory capital requires supervisory approval, daily VaR computation, backtesting of value-at-risk against actual outcomes, and stress testing of trading-book positions."),
+    ("IFRS 9", "5.5", "Expected credit loss measurement and staging",
+     "Expected credit losses must be measured using an unbiased, probability-weighted estimate reflecting the time value of money, with staging that recognises significant increases in credit risk and lifetime ECL where appropriate."),
+    ("IFRS 9", "B5.5", "Forward-looking information and scenarios",
+     "ECL estimates must incorporate reasonable and supportable forward-looking macroeconomic information, including multiple weighted scenarios, without undue cost or effort."),
+    ("ECB TRIM", "GIM", "General topics: model governance and data quality",
+     "Internal models must meet general requirements for model governance, data quality, and the management of model deficiencies, including a register of deficiencies and remediation timelines."),
+    ("ECB TRIM", "Credit", "Credit risk: PD/LGD estimation soundness",
+     "PD and LGD estimation for credit risk must be methodologically sound, with appropriate treatment of defaulted exposures, downturn conditions, margins of conservatism, and representativeness of data."),
+    ("EU AI Act", "Art.9", "High-risk AI: risk management system",
+     "Providers of high-risk AI systems must establish, implement, and maintain a continuous risk management system that identifies and mitigates risks to health, safety, and fundamental rights throughout the system lifecycle."),
+    ("EU AI Act", "Art.13", "High-risk AI: transparency and explainability",
+     "High-risk AI systems must be sufficiently transparent to enable users to interpret output and use it appropriately, accompanied by clear instructions and information on capabilities, limitations, and expected performance."),
+    ("EU AI Act", "Art.14", "High-risk AI: human oversight",
+     "High-risk AI systems must be designed to allow effective human oversight, enabling humans to understand, monitor, intervene in, and override automated decisions to prevent or minimise risks."),
+    ("RBI", "MRM", "Model risk management framework for banks",
+     "Banks must adopt a model risk management framework covering model identification, development standards, independent validation, periodic review, and governance, proportionate to model materiality and complexity."),
+    ("CCAR/DFAST", "Stress", "Capital stress-test model governance",
+     "Supervisory capital stress-testing models must be governed with documented assumptions, scenario design, sensitivity analysis, independent review, and controls over the production of loss, revenue, and capital projections."),
+    ("BCBS 239", "P3", "Risk data aggregation: accuracy and integrity",
+     "Risk data aggregation capabilities must ensure accuracy, integrity, completeness, and timeliness of risk data, with controls and reconciliation across source systems feeding risk and regulatory reporting."),
+    ("FRTB", "IMA", "Internal models approach eligibility",
+     "Eligibility for the internal models approach under the Fundamental Review of the Trading Book requires desk-level approval, profit-and-loss attribution tests, backtesting, and non-modellable risk factor treatment."),
 ]
 
 CONTROLS = [
@@ -237,9 +254,9 @@ def generate():
 
     # --- regulatory requirements ---
     reg_ids = []
-    for i, (fw, clause, title) in enumerate(REG_REQS):
+    for i, (fw, clause, title, text) in enumerate(REG_REQS):
         reg_ids.append(add_node("RegulatoryRequirement", f"R{i:03d}", framework=fw,
-                                clause=clause, title=title))
+                                clause=clause, title=title, text=text))
     sr117 = [r for (r, (fw, *_)) in zip(reg_ids, REG_REQS) if fw == "SR 11-7"]
     ai_act = [r for (r, (fw, *_)) in zip(reg_ids, REG_REQS) if fw == "EU AI Act"]
 

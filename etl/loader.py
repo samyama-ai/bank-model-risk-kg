@@ -80,7 +80,26 @@ def _load_edges(client, edges):
         client.query(q, GRAPH)
 
 
-def load(client: SamyamaClient, export: str | None = None) -> dict:
+def _embed_regulations(client, nodes):
+    """GraphRAG retrieval layer: embed each RegulatoryRequirement.text and index it.
+
+    Order matters — create the vector index FIRST, then SET embeddings so they
+    auto-index (an index created after insert does not backfill on this build).
+    """
+    from etl.embed import embed_texts, DIM
+    regs = [(p["id"], p["text"]) for label, p in nodes
+            if label == "RegulatoryRequirement" and p.get("text")]
+    client.create_vector_index("RegulatoryRequirement", "embedding", DIM, "cosine")
+    print(f"created vector index RegulatoryRequirement.embedding ({DIM}-dim, cosine)", flush=True)
+    vecs = embed_texts([t for _, t in regs])
+    for (rid, _), vec in zip(regs, vecs):
+        lit = "[" + ", ".join(f"{x:.6f}" for x in vec) + "]"
+        client.query(f'MATCH (r:RegulatoryRequirement) WHERE r.id = "{rid}" '
+                     f"SET r.embedding = {lit}", GRAPH)
+    print(f"embedded + indexed {len(regs)} regulatory requirements", flush=True)
+
+
+def load(client: SamyamaClient, export: str | None = None, embed: bool = True) -> dict:
     nodes, edges = generate()
     print(f"generated {len(nodes)} nodes, {len(edges)} edges", flush=True)
 
@@ -90,6 +109,12 @@ def load(client: SamyamaClient, export: str | None = None) -> dict:
     t1 = time.time()
     _load_edges(client, edges)
     print(f"loaded edges in {time.time()-t1:.1f}s", flush=True)
+
+    if embed:
+        try:
+            _embed_regulations(client, nodes)
+        except RuntimeError as e:
+            print(f"WARNING: skipping embeddings — {e}", flush=True)
 
     n, e = client.node_count(), client.edge_count()
     print(f"server reports: {n} nodes, {e} edges", flush=True)
@@ -105,6 +130,7 @@ if __name__ == "__main__":
     ap.add_argument("--url", default="http://127.0.0.1:8080", help="Samyama HTTP base URL")
     ap.add_argument("--graph", default="default")
     ap.add_argument("--export", default=None, help="Path to write a .sgsnap snapshot after load")
+    ap.add_argument("--no-embed", action="store_true", help="Skip the GraphRAG embedding step")
     args = ap.parse_args()
     client = SamyamaClient(args.url, args.graph)
-    load(client, export=args.export)
+    load(client, export=args.export, embed=not args.no_embed)
