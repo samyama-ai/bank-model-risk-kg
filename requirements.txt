@@ -1,0 +1,7 @@
+# Runtime dependencies for the Bank Model-Risk Knowledge Graph.
+# Mirrors [project.dependencies] in pyproject.toml — `pip install .` works too.
+# Requires Python >= 3.10. This repo talks to the engine over HTTP via its own
+# etl/sg_client.py, so it does NOT depend on the samyama SDK.
+requests>=2.28
+rich>=13.0
+fastembed>=0.3    # ONNX embeddings (no torch) for the GraphRAG retrieval layer

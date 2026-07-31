@@ -7,3 +7,5 @@ build/
 .ruff_cache/
 *.sgsnap.part
 .snapshots/
+.venv/
+venv/

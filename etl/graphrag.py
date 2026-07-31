@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="GraphRAG over the regulation corpus")
     ap.add_argument("question", help="A governance question in natural language")
     ap.add_argument("--url", default="http://127.0.0.1:8080")
-    ap.add_argument("--graph", default="default")
+    ap.add_argument("--graph", default="bank")
     ap.add_argument("--k", type=int, default=3, help="Number of clauses to retrieve")
     args = ap.parse_args()
     answer(SamyamaClient(args.url, args.graph), args.question, k=args.k)
