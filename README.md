@@ -54,28 +54,40 @@ EVIDENCES, VALIDATED_BY, PERFORMED_BY, RAISED, FEEDS, USED_IN
 
 Full details: **[docs/schema.md](docs/schema.md)**.
 
+## Documentation
+
+New here? Start with the guides:
+
+| Guide | What it covers |
+|-------|----------------|
+| **[GETTING_STARTED.md](GETTING_STARTED.md)** | prerequisites (Python ≥ 3.10) · install · run the engine (Docker) · load the graph · first query · GraphRAG |
+| **[docs/QUERYING.md](docs/QUERYING.md)** | ask questions via the **HTTP API**, the **Samyama CLI**, GraphRAG, or (optional) MCP |
+| [docs/schema.md](docs/schema.md) | full node/edge schema |
+
 ## Quick Start
 
-### Load from snapshot (recommended)
+**Full walkthrough → [GETTING_STARTED.md](GETTING_STARTED.md).** Needs **Python ≥ 3.10** and **Docker**.
+
+### Load from the committed snapshot (recommended)
 
 ```bash
-# Start Samyama (build it once: cargo build --release in samyama-graph)
-./target/release/samyama --host 127.0.0.1 --port 6379
+pip install -r requirements.txt
+docker run --rm -p 8080:8080 -p 6379:6379 public.ecr.aws/f9f6l5u4/samyama-graph:1.1.0
 
-# Import the committed snapshot (85 KB; includes the regulation HNSW vector index)
-curl -X POST http://127.0.0.1:8080/api/snapshot/import \
-  -F "file=@data/bank-model-risk.sgsnap"
+# create the tenant and import the committed snapshot (85 KB; includes the regulation HNSW index)
+curl -X POST http://localhost:8080/api/tenants -H 'Content-Type: application/json' -d '{"id":"bank","name":"Bank Model-Risk KG"}'
+curl -X POST http://localhost:8080/api/tenants/bank/snapshot/import -F "file=@data/bank-model-risk.sgsnap"
 ```
 
 ### Build from source (generate + load)
 
 ```bash
 git clone https://github.com/samyama-ai/bank-model-risk-kg.git && cd bank-model-risk-kg
-pip install -e ".[dev]"
+pip install -r requirements.txt          # or: pip install -e ".[dev]" for tests
 
-# with a Samyama server running on :8080
-python -m etl.loader --url http://127.0.0.1:8080
-python -m etl.loader --url http://127.0.0.1:8080 --export data/bank-model-risk.sgsnap
+curl -X POST http://localhost:8080/api/tenants -H 'Content-Type: application/json' -d '{"id":"bank","name":"Bank Model-Risk KG"}'
+python -m etl.loader --url http://localhost:8080                                  # generate (fixed seed) + load → bank
+python -m etl.loader --url http://localhost:8080 --export data/bank-model-risk.sgsnap
 ```
 
 ## Example governance queries

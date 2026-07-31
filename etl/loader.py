@@ -18,7 +18,7 @@ import time
 from etl.generate import generate
 from etl.sg_client import SamyamaClient
 
-GRAPH = "default"
+GRAPH = "bank"
 NODE_BATCH = 100
 EDGE_BATCH = 100
 
@@ -128,7 +128,7 @@ def load(client: SamyamaClient, export: str | None = None, embed: bool = True) -
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Load the Bank Model-Risk KG into Samyama")
     ap.add_argument("--url", default="http://127.0.0.1:8080", help="Samyama HTTP base URL")
-    ap.add_argument("--graph", default="default")
+    ap.add_argument("--graph", default=GRAPH)
     ap.add_argument("--export", default=None, help="Path to write a .sgsnap snapshot after load")
     ap.add_argument("--no-embed", action="store_true", help="Skip the GraphRAG embedding step")
     args = ap.parse_args()
