@@ -6,6 +6,22 @@
 > This repo holds the generator, loader and governance queries for the KG.
 
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-blue" alt="License"></a>
+<a href="https://huggingface.co/datasets/VaidhyaMegha/bank-model-risk-kg"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20dataset-VaidhyaMegha%2Fbank--model--risk--kg-yellow" alt="HuggingFace dataset"></a>
+
+**The graph is published as a dataset** — you do not have to run the generator:
+**[huggingface.co/datasets/VaidhyaMegha/bank-model-risk-kg](https://huggingface.co/datasets/VaidhyaMegha/bank-model-risk-kg)**
+(`v1.0`). All 520 nodes and 2,391 edges as node/edge CSVs, plus `bank-model-risk.sgsnap`.
+
+```python
+from datasets import load_dataset
+models = load_dataset("VaidhyaMegha/bank-model-risk-kg", "model", revision="v1.0")
+```
+
+> Everything is published — nothing is held back. The data is **entirely synthetic** and
+> Apache-2.0, so there is no upstream source, no third-party terms and nothing to redact.
+> The dataset was produced by running the generator and loader in this repo against an empty
+> engine; the result matched the committed snapshot exactly, confirming the `SEED = 42`
+> reproducibility claim.
 
 ---
 
