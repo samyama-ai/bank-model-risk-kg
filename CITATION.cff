@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this knowledge graph, please cite it as below. DATASET_CARD.md's Citation section has details."
+title: "Bank Model-Risk Knowledge Graph"
+type: dataset
+authors:
+  - name: "Samyama"
+    website: "https://git.samyama.ai/Samyama.ai"
+license: Apache-2.0
+repository-code: "https://git.samyama.ai/Samyama.ai/bank-model-risk-kg"
+keywords:
+  - knowledge-graph
+  - samyama
+  - property-graph
+  - finance
+  - risk
+date-released: "2026-09-23"
